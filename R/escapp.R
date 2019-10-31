@@ -183,10 +183,13 @@ esc_app <- function() {
         shiny::need(input$es_metric_sel)
       )
 
-      var_name <- glue::glue("{input$es_var_sel}")
-      if (input$es_metric_sel == 'ranked') {
-        var_name <- glue::glue("{var_name}_ranked")
-      }
+      metric <- switch(
+        input$es_metric_sel,
+        'ranked' = '_ranked',
+        'raw' = ''
+      )
+
+      var_name <- glue::glue("{input$es_var_sel}{metric}")
 
       return(var_name)
     })
