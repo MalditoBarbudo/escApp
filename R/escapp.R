@@ -207,67 +207,47 @@ esc_app <- function() {
 
       # data
       data_color_map <- data_res()
-      
+
 
       palette <- leaflet::colorNumeric(
         viridis::plasma(100),
-        # raster::values(basal_area_raster),
-        raster::values(lidar_raster),
+        data_color_map[[var_name()]],
         na.color = 'transparent'
       )
-
-      # poly intermediates
-      poly_type <- input$poly_type_sel
-      var_column <- glue::glue('mean_{tolower(input$lidar_var_sel)}')
-      user_poly <- data_res() %>%
-        sf::st_transform('+proj=longlat +datum=WGS84') %>%
-        dplyr::select(poly_id, !! rlang::sym(var_column))
 
       # proper map
       leaflet::leaflet() %>%
         leaflet::setView(1.744, 41.726, zoom = 8) %>%
         leaflet::addProviderTiles(
           leaflet::providers$Esri.WorldShadedRelief,
-          group = 'Relief' %>% translate_app(lang_declared),
+          group = 'Relief', # %>% translate_app(lang_declared),
           options = leaflet::providerTileOptions(
             # zIndex = -1
           )
         ) %>%
         leaflet::addProviderTiles(
           leaflet::providers$Esri.WorldImagery,
-          group = 'Imaginery' %>% translate_app(lang_declared),
+          group = 'Imaginery', # %>% translate_app(lang_declared),
           options = leaflet::providerTileOptions(
             # zIndex = -1
           )
         ) %>%
         leaflet::addMapPane('polys', zIndex = 410) %>%
-        leaflet::addMapPane('rasters', zIndex = 420) %>%
+        leaflet::addMapPane('plots', zIndex = 420) %>%
         leaflet::addLayersControl(
-          baseGroups = c('Relief', 'Imaginery') %>% translate_app(lang_declared),
-          overlayGroups = c('lidar', 'poly') %>%
-            translate_app(lang_declared) %>%
-            purrr::map_chr(~ glue::glue(.x)),
-          options = leaflet::layersControlOptions(collapsed = FALSE, autoZIndex = FALSE)
-        ) %>%
-        leaflet::hideGroup('lidar' %>% translate_app(lang_declared)) %>%
-        leaflet::removeImage('raster') %>%
-        leaflet::clearGroup('poly' %>%
-                              translate_app(lang_declared) %>%
-                              purrr::map_chr(~ glue::glue(.x))) %>%
-        leaflet::addRasterImage(
-          lidar_raster, project = FALSE, colors = palette, opacity = 1,
-          group = 'lidar' %>% translate_app(lang_declared), layerId = 'raster'
+          baseGroups = c('Relief', 'Imaginery'), # %>% translate_app(lang_declared),
+          options = leaflet::layersControlOptions(collapsed = TRUE, autoZIndex = FALSE)
         ) %>%
         leaflet::addPolygons(
-          data = user_poly,
-          group = 'poly' %>%
-            translate_app(lang_declared) %>%
-            purrr::map_chr(~ glue::glue(.x)),
-          label = ~poly_id,
-          layerId = ~poly_id,
+          data = data_color_map,
+          # group = 'poly' %>%
+          #   translate_app(lang_declared) %>%
+          #   purrr::map_chr(~ glue::glue(.x)),
+          label = ~municipality_name,
+          layerId = ~municipality_name,
           weight = 1, smoothFactor = 1,
           opacity = 1.0, fill = TRUE,
-          color = '#6C7A89FF', fillColor = palette(user_poly[[var_column]]),
+          color = '#6C7A89FF', fillColor = palette(data_color_map[[var_name()]]),
           fillOpacity = 0.7,
           highlightOptions = leaflet::highlightOptions(
             color = "#CF000F", weight = 2,
@@ -278,26 +258,27 @@ esc_app <- function() {
           )
         ) %>%
         leaflet::addLegend(
-          pal = palette, values = raster::values(lidar_raster),
-          title = input$lidar_var_sel %>% translate_app(lang_declared), position = 'bottomright',
+          pal = palette, values = data_color_map[[var_name()]],
+          # title = input$lidar_var_sel %>% translate_app(lang_declared), position = 'bottomright',
+          title = input$es_var_sel,
           opacity = 1
-        ) %>%
+        ) #%>%
         # leaflet.extras plugins
-        leaflet.extras::addDrawToolbar(
-          targetGroup = 'poly' %>%
-            translate_app(lang_declared) %>%
-            purrr::map_chr(~ glue::glue(.x)),
-          position = 'topleft',
-          polylineOptions = FALSE, circleOptions = FALSE, rectangleOptions = FALSE,
-          markerOptions = FALSE, circleMarkerOptions = FALSE,
-          polygonOptions = leaflet.extras::drawPolygonOptions(
-            shapeOptions = leaflet.extras::drawShapeOptions()
-          ),
-          editOptions = leaflet.extras::editToolbarOptions(
-            edit = TRUE, remove = TRUE
-          ),
-          singleFeature = TRUE
-        )
+        # leaflet.extras::addDrawToolbar(
+        #   targetGroup = 'poly' %>%
+        #     translate_app(lang_declared) %>%
+        #     purrr::map_chr(~ glue::glue(.x)),
+        #   position = 'topleft',
+        #   polylineOptions = FALSE, circleOptions = FALSE, rectangleOptions = FALSE,
+        #   markerOptions = FALSE, circleMarkerOptions = FALSE,
+        #   polygonOptions = leaflet.extras::drawPolygonOptions(
+        #     shapeOptions = leaflet.extras::drawShapeOptions()
+        #   ),
+        #   editOptions = leaflet.extras::editToolbarOptions(
+        #     edit = TRUE, remove = TRUE
+        #   ),
+        #   singleFeature = TRUE
+        # )
     }) # end of map output
 
 
