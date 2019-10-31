@@ -164,7 +164,7 @@ esc_app <- function() {
     data_res <- shiny::reactive({
 
       shiny::validate(
-        shiny::need(input$es_level_sel)
+        shiny::need(input$es_level_sel, 'no inputs')
       )
 
       data_res <- switch(
@@ -179,8 +179,8 @@ esc_app <- function() {
     var_name <- shiny::reactive({
 
       shiny::validate(
-        shiny::need(input$es_var_sel),
-        shiny::need(input$es_metric_sel)
+        shiny::need(input$es_var_sel, 'no inputs'),
+        shiny::need(input$es_metric_sel, 'no inputs')
       )
 
       metric <- switch(
