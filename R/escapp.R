@@ -205,13 +205,13 @@ esc_app <- function() {
 
       lang_declared <- lang()
 
-      # data
+      # data & var
       data_color_map <- data_res()
-
+      var_selected <- var_name()
 
       palette <- leaflet::colorNumeric(
         viridis::plasma(100),
-        data_color_map[[var_name()]],
+        data_color_map[[var_selected]],
         na.color = 'transparent'
       )
 
@@ -247,7 +247,7 @@ esc_app <- function() {
           layerId = ~municipality_name,
           weight = 1, smoothFactor = 1,
           opacity = 1.0, fill = TRUE,
-          color = '#6C7A89FF', fillColor = palette(data_color_map[[var_name()]]),
+          color = '#6C7A89FF', fillColor = palette(data_color_map[[var_selected]]),
           fillOpacity = 0.7,
           highlightOptions = leaflet::highlightOptions(
             color = "#CF000F", weight = 2,
@@ -258,7 +258,7 @@ esc_app <- function() {
           )
         ) %>%
         leaflet::addLegend(
-          pal = palette, values = data_color_map[[var_name()]],
+          pal = palette, values = data_color_map[[var_selected]],
           # title = input$lidar_var_sel %>% translate_app(lang_declared), position = 'bottomright',
           title = input$es_var_sel,
           opacity = 1
