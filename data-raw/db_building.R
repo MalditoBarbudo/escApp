@@ -52,10 +52,20 @@ services_var_thesaurus <- all_services_list %>%
   purrr::map_dfr(~dplyr::select(.x, var_id, var_description)) %>%
   dplyr::distinct()
 
+simplified_municipalities <- sf::read_sf(
+  '../../01_nfi_app/NFIappkg/data-raw/shapefiles/bm5mv20sh0tpm1_20180101_0.shp'
+) %>%
+  dplyr::select(municipality_id = CODIMUNI, municipality_name = NOMMUNI, geometry) %>%
+  rmapshaper::ms_simplify(0.01) %>%
+  sf::st_transform('+proj=longlat +datum=WGS84')
+
 all_services_list %>%
   purrr::map(~ dplyr::select(.x, -var_description, -var_id)) %>%
   purrr::reduce(
     ~ dplyr::full_join(.x, .y, by = c('municipality_id', 'municipality_name'))
+  ) %>%
+  dplyr::left_join(
+    simplified_municipalities, by = c('municipality_id', 'municipality_name')
   ) -> municipality_services
 
 usethis::use_data(

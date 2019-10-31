@@ -12,4 +12,5 @@ Imports:
     shinyjs,
     shinyWidgets,
     leaflet,
-    glue
+    glue,
+    sf
