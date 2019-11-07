@@ -73,3 +73,9 @@ usethis::use_data(
   # plot_services,
   internal = TRUE, overwrite = TRUE
 )
+
+## plots
+
+foo <- raster::raster(
+  'data-raw/plots_data/R4ErosionCont.tif'
+)
